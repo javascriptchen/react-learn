@@ -1,87 +1,70 @@
 import React, { Component, Fragment } from "react";
-import "./index.css";
-import TodoItem from "./TodoItem";
-import axios from "axios";
+import { Input, Button, List } from "antd";
+import "antd/dist/antd.css";
+import store from "./store";
 
 class TodoList extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      inputValue: "ret",
-      list: []
-    };
+    this.state = store.getState();
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleStoreChange = this.handleStoreChange.bind(this);
     this.handleButtonClick = this.handleButtonClick.bind(this);
-    this.handelItemDelete = this.handelItemDelete.bind(this);
+    store.subscribe(this.handleStoreChange);
   }
 
   render() {
     return (
       <Fragment>
-        <div>
-          <label htmlFor="inputArea">输入</label>
-          <input
-            id="inputArea"
-            className="input"
-            onChange={this.handleInputChange}
-            value={this.state.inputValue}
-            ref={input => {
-              this.input = input;
-            }}
+        <div style={{ margin: "10px 0 10px 10px" }}>
+          <div style={{ marginBottom: "10px" }}>
+            <Input
+              value={this.state.inputValue}
+              placeholder="Basic usage"
+              onChange={this.handleInputChange}
+              style={{
+                width: "300px",
+                marginRight: "10px"
+              }}
+              ref={input => {
+                return (this.input = input);
+              }}
+            />
+            <Button type="primary" onClick={this.handleButtonClick}>
+              提交
+            </Button>
+          </div>
+          <List
+            style={{ width: "300px" }}
+            bordered
+            dataSource={this.state.list}
+            renderItem={item => <List.Item>{item}</List.Item>}
           />
-          <button onClick={this.handleButtonClick}>提交</button>
         </div>
-        <ul>{this.getItem()}</ul>
       </Fragment>
     );
   }
 
-  componentDidMount(){
-    axios.get('/api/getList')
-    .then((success)=>{
-      console.log('success');
-    })
-    .catch(err=>{
-      console.log('err');
-    })
-  }
-
-  getItem() {
-    return this.state.list.map((item, index) => {
-      return (
-        <TodoItem
-          key={item}
-          content={item}
-          index={index}
-          itemDelete={this.handelItemDelete.bind(this)}
-        />
-      );
-    });
-  }
-
   handleInputChange(e) {
-    const value = this.input.value;
-    this.setState(() => ({ inputValue: value }));
-    // this.setState({
-    //   inputValue: e.target.value
-    // });
+    //   const value = this.input.value;
+    //   console.log(value);
+    // console.log(e.target.value);
+    const action = {
+      type: "change_input_value",
+      value: e.target.value
+    };
+    store.dispatch(action);
+  }
+
+  handleStoreChange() {
+    this.setState(store.getState());
   }
 
   handleButtonClick() {
-    this.setState(prevState => ({
-      list: [...prevState.list, prevState.inputValue],
-      inputValue: ""
-    }));
-  }
-
-  handelItemDelete(index) {
-    // 不推荐直接修改state，因为性能差
-    this.setState(prevState => {
-      const list = prevState.list;
-      list.splice(index, 1);
-      return { list };
-    });
+    const action = {
+      type: "add_input_value"
+    };
+    store.dispatch(action);
   }
 }
-
 export default TodoList;
