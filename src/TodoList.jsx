@@ -7,7 +7,7 @@ class TodoList extends Component {
     super(props);
     this.state = {
       inputValue: "ret",
-      list: ["学习英文", "学习react"]
+      list: []
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleButtonClick = this.handleButtonClick.bind(this);
@@ -24,6 +24,9 @@ class TodoList extends Component {
             className="input"
             onChange={this.handleInputChange}
             value={this.state.inputValue}
+            ref={input => {
+              this.input = input;
+            }}
           />
           <button onClick={this.handleButtonClick}>提交</button>
         </div>
@@ -36,6 +39,7 @@ class TodoList extends Component {
     return this.state.list.map((item, index) => {
       return (
         <TodoItem
+          key={item}
           content={item}
           index={index}
           itemDelete={this.handelItemDelete.bind(this)}
@@ -45,23 +49,26 @@ class TodoList extends Component {
   }
 
   handleInputChange(e) {
-    this.setState({
-      inputValue: e.target.value
-    });
+    const value = this.input.value;
+    this.setState(() => ({ inputValue: value }));
+    // this.setState({
+    //   inputValue: e.target.value
+    // });
   }
 
   handleButtonClick() {
-    this.setState({
-      list: [...this.state.list, this.state.inputValue],
+    this.setState(prevState => ({
+      list: [...prevState.list, prevState.inputValue],
       inputValue: ""
-    });
+    }));
   }
 
   handelItemDelete(index) {
-    const list = this.state.list;
-    list.splice(index, 1);
-    this.setState({
-      list: list
+    // 不推荐直接修改state，因为性能差
+    this.setState(prevState => {
+      const list = prevState.list;
+      list.splice(index, 1);
+      return { list };
     });
   }
 }
