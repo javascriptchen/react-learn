@@ -1,8 +1,14 @@
-import React, { Component, Fragment } from "react";
-import { Input, Button, List } from "antd";
+import React, { Component } from "react";
+
 import "antd/dist/antd.css";
 import store from "./store";
-import {getInputChangeAction,getAddItemAction,getDeleteItemAction} from './store/actionCreator';
+import {
+  getInputChangeAction,
+  getAddItemAction,
+  getDeleteItemAction,
+  getTodoList
+} from "./store/actionCreator";
+import TodoListUI from "./TodoListUI";
 
 class TodoList extends Component {
   constructor(props) {
@@ -16,39 +22,23 @@ class TodoList extends Component {
 
   render() {
     return (
-      <Fragment>
-        <div style={{ margin: "10px 0 10px 10px" }}>
-          <div style={{ marginBottom: "10px" }}>
-            <Input
-              value={this.state.inputValue}
-              onChange={this.handleInputChange}
-              placeholder="Basic usage"
-              style={{
-                width: "300px",
-                marginRight: "10px"
-              }}
-            />
-            <Button type="primary" onClick={this.handleClick}>
-              提交
-            </Button>
-          </div>
-          <List
-            style={{ width: "300px" }}
-            bordered
-            dataSource={this.state.list}
-            renderItem={(item, index) => (
-              <List.Item onClick={this.handleItemDelete.bind(this, index)}>
-                {item}
-              </List.Item>
-            )}
-          />
-        </div>
-      </Fragment>
+      <TodoListUI
+        inputValue={this.state.inputValue}
+        list={this.state.list}
+        handleInputChange={this.handleInputChange}
+        handleClick={this.handleClick}
+        handleItemDelete={this.handleItemDelete}
+      />
     );
   }
 
+  componentDidMount() {
+    const action = getTodoList();
+    store.dispatch(action);
+  }
+
   handleInputChange(e) {
-    const action = getInputChangeAction(e.target.value)
+    const action = getInputChangeAction(e.target.value);
     // 创建action，dispatch action
     store.dispatch(action);
   }
@@ -59,7 +49,7 @@ class TodoList extends Component {
   }
 
   handleClick() {
-    const action = getAddItemAction()
+    const action = getAddItemAction();
     store.dispatch(action);
   }
 
