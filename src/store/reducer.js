@@ -1,19 +1,29 @@
+import {CHANGE_INPUT_VALUE, DELETE_TODO_ITEM, ADD_INPUT_VALUE} from './actionTypes'
+
 const defaultState = {
     inputValue: "123",
     list: [1, 2]
 }
-export default (state = defaultState, action) => {
-    // console.log(state, action);
-    if (action.type === 'change_input_value') {
-        const newState = JSON.parse(JSON.stringify(state));
+export default (prevstate = defaultState, action) => {
+    if (action.type === CHANGE_INPUT_VALUE) {
+        const newState = JSON.parse(JSON.stringify(prevstate))
         newState.inputValue = action.value;
         return newState;
     }
-    if (action.type === 'add_input_value') {
-        const newState = JSON.parse(JSON.stringify(state));
+
+    if (action.type === ADD_INPUT_VALUE) {
+        const newState = JSON.parse(JSON.stringify(prevstate))
         newState.list.push(newState.inputValue)
-        newState.inputValue = ''
+        newState.inputValue = ""
         return newState;
     }
-    return state
+
+    if (action.type === DELETE_TODO_ITEM) {
+        const newState = JSON.parse(JSON.stringify(prevstate))
+        newState.list.splice(action.index, 1)
+        return newState;
+    }
+
+
+    return prevstate
 }

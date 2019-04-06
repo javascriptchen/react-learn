@@ -2,15 +2,14 @@ import React, { Component, Fragment } from "react";
 import { Input, Button, List } from "antd";
 import "antd/dist/antd.css";
 import store from "./store";
-import {getInputChangeAction,getAddItemAction,getDeleteItemAction} from './store/actionCreator';
 
 class TodoList extends Component {
   constructor(props) {
     super(props);
     this.state = store.getState();
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleClick = this.handleClick.bind(this);
     this.handleStoreChange = this.handleStoreChange.bind(this);
+    this.handleButtonClick = this.handleButtonClick.bind(this);
     store.subscribe(this.handleStoreChange);
   }
 
@@ -20,15 +19,16 @@ class TodoList extends Component {
         <div style={{ margin: "10px 0 10px 10px" }}>
           <div style={{ marginBottom: "10px" }}>
             <Input
+              
               value={this.state.inputValue}
-              onChange={this.handleInputChange}
               placeholder="Basic usage"
+              onChange={this.handleInputChange}
               style={{
                 width: "300px",
                 marginRight: "10px"
               }}
             />
-            <Button type="primary" onClick={this.handleClick}>
+            <Button type="primary" onClick={this.handleButtonClick}>
               提交
             </Button>
           </div>
@@ -36,11 +36,7 @@ class TodoList extends Component {
             style={{ width: "300px" }}
             bordered
             dataSource={this.state.list}
-            renderItem={(item, index) => (
-              <List.Item onClick={this.handleItemDelete.bind(this, index)}>
-                {item}
-              </List.Item>
-            )}
+            renderItem={item => <List.Item>{item}</List.Item>}
           />
         </div>
       </Fragment>
@@ -48,23 +44,24 @@ class TodoList extends Component {
   }
 
   handleInputChange(e) {
-    const action = getInputChangeAction(e.target.value)
-    // 创建action，dispatch action
+    const value = this.input.value;
+    console.log(value);
+    // console.log(e.target.value);
+    const action = {
+      type: "change_input_value",
+      value: e.target.value
+    };
     store.dispatch(action);
   }
 
   handleStoreChange() {
-    // console.log('123');
     this.setState(store.getState());
   }
 
-  handleClick() {
-    const action = getAddItemAction()
-    store.dispatch(action);
-  }
-
-  handleItemDelete(index) {
-    const action = getDeleteItemAction(index);
+  handleButtonClick() {
+    const action = {
+      type: "add_input_value"
+    };
     store.dispatch(action);
   }
 }
