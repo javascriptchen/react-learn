@@ -1,61 +1,55 @@
-import React, { Component } from "react";
-
-import "antd/dist/antd.css";
-import store from "./store";
-import {
-  getInputChangeAction,
-  getAddItemAction,
-  getDeleteItemAction,
-  getTodoList
-} from "./store/actionCreator";
-import TodoListUI from "./TodoListUI";
+import React, { Component, Fragment } from "react";
+import { connect } from "react-redux";
 
 class TodoList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = store.getState();
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.handleStoreChange = this.handleStoreChange.bind(this);
-    store.subscribe(this.handleStoreChange);
-  }
-
   render() {
     return (
-      <TodoListUI
-        inputValue={this.state.inputValue}
-        list={this.state.list}
-        handleInputChange={this.handleInputChange}
-        handleClick={this.handleClick}
-        handleItemDelete={this.handleItemDelete}
-      />
+      <Fragment>
+        <div>
+          <input
+            type="text"
+            value={this.props.inputValue}
+            onChange={this.props.changeInputValue}
+          />
+          <button onClick={this.props.handleClick}>提交</button>
+        </div>
+        <ul>
+          <li>123</li>
+        </ul>
+      </Fragment>
     );
   }
-
-  componentDidMount() {
-    const action = getTodoList();
-    store.dispatch(action);
-  }
-
-  handleInputChange(e) {
-    const action = getInputChangeAction(e.target.value);
-    // 创建action，dispatch action
-    store.dispatch(action);
-  }
-
-  handleStoreChange() {
-    // console.log('123');
-    this.setState(store.getState());
-  }
-
-  handleClick() {
-    const action = getAddItemAction();
-    store.dispatch(action);
-  }
-
-  handleItemDelete(index) {
-    const action = getDeleteItemAction(index);
-    store.dispatch(action);
-  }
 }
-export default TodoList;
+
+// 映射关系
+const mapStateToProps = state => {
+  return {
+    inputValue: state.inputValue
+  };
+};
+
+// store.dispatch
+const mapDispatchProps = dispatch => {
+  return {
+    changeInputValue(e) {
+      const action = {
+        type: "change_input_value",
+        value: e.target.value
+      };
+      dispatch(action);
+    },
+    handleClick() {
+        console.log(123);
+      const action = {
+        type: "add_item"
+      };
+      dispatch(action);
+    }
+  };
+};
+
+// connect TodoList和store连接
+export default connect(
+  mapStateToProps,
+  mapDispatchProps
+)(TodoList);
